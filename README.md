@@ -11,7 +11,7 @@
   </a>
 </div>
 
-![Screenshot](ExVotic.jpg)
+![Screenshot](img/ExVotic.jpg)
 
 <hr><br>
 # Hello You Can Request Configs Via ```@ExVotic_Network_bot```
