@@ -1,4 +1,3 @@
 <center>
-# Silverbullet-openbullet-configs
+  <h1> ExVotic Network</h1>
 </center>
-Here You Can Find Configs For SilverBullet &amp; Openbullet (Only For Educational Purpose) #ExVotic_Network
