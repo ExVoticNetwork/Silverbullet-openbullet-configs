@@ -11,11 +11,14 @@
   </a>
 </div>
 
-![Screenshot](img/ExVotic.jpg)
+
+<div align=center>
+<img align=center src="img/ExVotic.jpg" alt="drawing" width="800"/>
+</div>
 
 <hr><br>
-# Hello You Can Request Configs Via ```@ExVotic_Network_bot```
 
+<h5>Hello You Can Request Configs Via <tt>@ExVotic_Network_bot</tt></h5>
 
 # **Here You Can Find**
  - Openbullet Configs
@@ -31,7 +34,7 @@
 <hr>
 
 ## ExVotic Network --> [ExVotic Network](https://t.me/ExVotic_Network)<br>
-## Exvotic Configs -- [Exvotic Configs](https://t.me/ExVotic_Configs)<br>
+## Exvotic Configs --> [Exvotic Configs](https://t.me/ExVotic_Configs)<br>
 ##  ExVotic Giveaways --> [ExVotic Giveaways](https://t.me/ExVotic_Giveaways) <br>
 ## ExVotic Cracking & Spamming --> [ExVotic Cracking & Spamming](https://t.me/ExVotic_BlackHat)<br>
 ## ExVotic Mirror Hub --> [ExVotic Mirror Hub](https://t.me/ExVotic_Mirror_Group)<br>
