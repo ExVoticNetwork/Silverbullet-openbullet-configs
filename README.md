@@ -1,3 +1,3 @@
 <center>
-  <h1> ExVotic Network</h1>
+  <h1 align="center"> ExVotic Network</h1>
 </center>
